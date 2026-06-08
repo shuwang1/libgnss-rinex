@@ -1,6 +1,8 @@
 # libgnss-rinex-swift
 
-`libgnss-rinex-swift` is a pure Swift implementation of GNSS RINEX (Receiver Independent Exchange Format) parsing and generation capabilities, originally adapted from the `libgnss-rinex` C library.
+[![CI](https://github.com/shuwang1/Orientable-libgnss-rinex/actions/workflows/ci.yml/badge.svg)](https://github.com/shuwang1/Orientable-libgnss-rinex/actions/workflows/ci.yml)
+
+`libgnss-rinex-swift` is a pure Swift implementation of GNSS RINEX (Receiver Independent Exchange Format) parsing and generation capabilities, originally adapted from a Orientable AI internal C/C++ project.
 
 ## Features
 
