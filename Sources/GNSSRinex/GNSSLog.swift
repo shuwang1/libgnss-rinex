@@ -4,6 +4,7 @@
 //
 
 import Foundation
+import Logging
 
 public enum GNSSLogLevel: Int, Comparable {
     case none = 0
@@ -16,30 +17,36 @@ public enum GNSSLogLevel: Int, Comparable {
     public static func < (lhs: GNSSLogLevel, rhs: GNSSLogLevel) -> Bool {
         return lhs.rawValue < rhs.rawValue
     }
+    
+    var swiftLogLevel: Logger.Level {
+        switch self {
+        case .none, .error: return .error
+        case .warn: return .warning
+        case .info: return .info
+        case .debug: return .debug
+        case .trace: return .trace
+        }
+    }
 }
 
 public struct GNSSLog {
     
+    /// The global logger instance
+    nonisolated(unsafe) public static var logger = Logger(label: "GNSSRinex")
+    
     /// Global log level filter
-    nonisolated(unsafe) public static var level: GNSSLogLevel = .trace
-    
-    /// Optional custom handler
-    nonisolated(unsafe) public static var handler: ((GNSSLogLevel, String, Int, String) -> Void)?
-    
-    private static let tags = ["---", "ERR", "WRN", "INF", "DBG", "TRC"]
+    nonisolated(unsafe) public static var level: GNSSLogLevel = .trace {
+        didSet {
+            logger.logLevel = level.swiftLogLevel
+        }
+    }
     
     /// Main trace function
     public static func trace(_ lvl: GNSSLogLevel, file: String = #file, line: Int = #line, _ message: @autoclosure () -> String) {
         if lvl > level || lvl < .error { return }
         
         let msg = message()
-        if let handler = handler {
-            handler(lvl, file, line, msg)
-        } else {
-            let tag = tags[lvl.rawValue]
-            let filename = (file as NSString).lastPathComponent
-            print("[\(tag)] \(filename):\(line): \(msg)")
-        }
+        logger.log(level: lvl.swiftLogLevel, Logger.Message(stringLiteral: msg), file: file, function: "", line: UInt(line))
     }
     
     /// Dump a matrix to log
@@ -57,11 +64,7 @@ public struct GNSSLog {
             output += "\n"
         }
         
-        if let handler = handler {
-            handler(lvl, file, line, output)
-        } else {
-            print(output, terminator: "")
-        }
+        logger.log(level: lvl.swiftLogLevel, Logger.Message(stringLiteral: output), file: file, function: "", line: UInt(line))
     }
     
     /// Dump raw bytes
@@ -74,10 +77,6 @@ public struct GNSSLog {
         }
         output += "\n"
         
-        if let handler = handler {
-            handler(lvl, file, line, output)
-        } else {
-            print(output, terminator: "")
-        }
+        logger.log(level: lvl.swiftLogLevel, Logger.Message(stringLiteral: output), file: file, function: "", line: UInt(line))
     }
 }
