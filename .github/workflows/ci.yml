@@ -33,3 +33,7 @@ jobs:
         uses: maxep/spm-lcov-action@0.3.0
         with:
           output-file: ./coverage/lcov.info
+      - name: Upload
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_SHUWANG1_LIBGNSS_RINEX_SWIFT }}
